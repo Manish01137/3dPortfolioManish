@@ -12,9 +12,9 @@ export function RevealText({ children, className = "" }: { children: string; cla
     let cancelled = false;
     fontsReady().then(() => {
       if (cancelled) return;
-      split = SplitText.create(el, { type: "words", aria: "none" });
-      // muted → fg (muted already passes WCAG AA, so text is never unreadable)
-      gsap.fromTo(split.words, { color: "var(--muted)" }, { color: "var(--fg)", ease: "none", stagger: 0.1, scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 50%", scrub: true } });
+      split = SplitText.create(el, { type: "words", aria: "none", wordsClass: "rv-word" });
+      // --p drives a muted → fg colour mix in CSS (muted passes WCAG AA; follows theme switches)
+      gsap.fromTo(split.words, { "--p": 0 }, { "--p": 1, ease: "none", stagger: 0.1, scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 50%", scrub: true } });
     });
     return () => { cancelled = true; split?.revert(); };
   }, { scope: ref });

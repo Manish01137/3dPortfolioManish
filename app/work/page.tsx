@@ -3,7 +3,7 @@ import { PageIntro } from "@/components/work/PageIntro";
 import { WorkExplorer } from "@/components/work/WorkExplorer";
 import { projects } from "@/content/projects";
 
-export const metadata: Metadata = { title: "Work", description: "Websites, Shopify stores, SaaS and AI tools built by Manish Beniwal and Shape-360.", alternates: { canonical: "/work" } };
+export const metadata: Metadata = { title: "Work", description: "Websites, Shopify stores, SaaS and AI tools built by Manish Beniwal.", alternates: { canonical: "/work" } };
 
 export default function WorkPage() {
   return (

@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { LayoutGrid, List } from "lucide-react";
 import { gsap, useGSAP, isFinePointer } from "@/lib/gsap";
 import { filters, projects, type FilterKey } from "@/content/projects";
-import { ProjectCard } from "./ProjectCard";
+import { ProjectTile } from "./ProjectTile";
 import { pad } from "@/lib/utils";
 
 export function WorkExplorer() {
@@ -54,7 +54,7 @@ export function WorkExplorer() {
 
       {view === "grid" ? (
         <ul className="mt-14 grid gap-x-8 gap-y-16 md:grid-cols-2">
-          {list.map((p, i) => <li key={p.slug} className={`work-item ${i % 2 === 1 ? "md:mt-24" : ""}`}><ProjectCard p={p} /></li>)}
+          {list.map((p, i) => <li key={p.slug} className={`work-item ${i % 2 === 1 ? "md:mt-24" : ""}`}><ProjectTile p={p} headingLevel="h2" /></li>)}
         </ul>
       ) : (
         <ul className="mt-10 border-t border-line">
@@ -62,7 +62,7 @@ export function WorkExplorer() {
             <li key={p.slug} className="work-item border-b border-line" onMouseEnter={() => setHover(p.slug)} onMouseLeave={() => setHover(null)}>
               <Link href={`/work/${p.slug}`} data-cursor="OPEN" className="group grid grid-cols-[2.5rem_1fr_auto] items-baseline gap-4 py-7 md:grid-cols-[3rem_1.4fr_1fr_6rem]">
                 <span className="mono text-muted">{pad(i + 1)}</span>
-                <span className="font-display text-[clamp(1.6rem,3.6vw,3.2rem)] font-semibold leading-none tracking-tight transition-transform duration-500 group-hover:translate-x-4 group-hover:text-accent">{p.title}</span>
+                <span className="font-display text-[clamp(1.6rem,3.6vw,3.2rem)] font-medium leading-none tracking-[-0.04em] transition-transform duration-500 group-hover:translate-x-4 group-hover:text-accent">{p.title}</span>
                 <span className="hidden text-muted md:block">{p.category}</span>
                 <span className="mono text-right text-muted">{p.year}</span>
               </Link>

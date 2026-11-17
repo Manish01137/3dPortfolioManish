@@ -1,4 +1,4 @@
-export function CircularBadge({ text = "• SHAPE-360 • SINCE 2024 ", size = 120 }: { text?: string; size?: number }) {
+export function CircularBadge({ text = "• MANISH BENIWAL • SINCE 2024 ", size = 120 }: { text?: string; size?: number }) {
   const t = (text + " ").repeat(1);
   return (
     <div className="relative" style={{ width: size, height: size }} aria-hidden>
@@ -8,7 +8,7 @@ export function CircularBadge({ text = "• SHAPE-360 • SINCE 2024 ", size = 1
           <textPath href="#circ" textLength="236">{t}</textPath>
         </text>
       </svg>
-      <span className="absolute inset-0 grid place-items-center font-display text-2xl text-accent">*</span>
+      <span className="absolute inset-0 grid place-items-center font-mono text-xl text-accent">MB</span>
     </div>
   );
 }

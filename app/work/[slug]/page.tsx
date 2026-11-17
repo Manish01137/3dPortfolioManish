@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: `${p.title} — ${p.category}`,
     description: p.summary,
     alternates: { canonical: `/work/${p.slug}` },
-    openGraph: { title: `${p.title} — Shape-360 case study`, description: p.summary, images: [{ url: p.cover, width: 1600, height: 1000 }] },
+    openGraph: { title: `${p.title} — case study by Manish Beniwal`, description: p.summary, images: [{ url: p.cover, width: 1600, height: 1000 }] },
   };
 }
 

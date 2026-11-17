@@ -7,8 +7,8 @@ import { Button } from "../ui/Button";
 import { site } from "@/content/site";
 
 export const Brand = ({ className = "" }: { className?: string }) => (
-  <span className={`font-display text-xl font-semibold tracking-tight ${className}`}>
-    Shape-360<span className="text-accent">*</span>
+  <span className={`font-display text-lg font-semibold tracking-[-0.03em] sm:text-xl ${className}`}>
+    Manish Beniwal<span className="text-accent">*</span>
   </span>
 );
 
@@ -42,7 +42,7 @@ export function Header() {
       className={`fixed inset-x-0 top-0 z-[60] transition-all duration-500 ${hidden && !open ? "-translate-y-full" : ""} ${solid && !open ? "bg-bg/60 backdrop-blur-md" : ""}`}
     >
       <div className="container-x flex h-20 items-center justify-between">
-        <Link href="/" aria-label="Shape-360 — home" onClick={() => setOpen(false)} data-cursor="HOME"><Brand /></Link>
+        <Link href="/" aria-label="Manish Beniwal — home" onClick={() => setOpen(false)} data-cursor="HOME"><Brand /></Link>
         <p className="mono hidden text-muted lg:block" aria-label="Local time in Bangalore">
           Bangalore — {time || "--:--"} IST
         </p>

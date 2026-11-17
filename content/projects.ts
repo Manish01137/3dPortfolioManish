@@ -63,7 +63,7 @@ export const projects: Project[] = [
   make({
     slug: "joinetra",
     title: "Joinetra",
-    client: "Shape-360 (own product)",
+    client: "Own product",
     category: "SaaS · Own product",
     filter: "saas",
     country: "India",

@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useMenu } from "@/lib/menu";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
-import { site, socialHref } from "@/content/site";
+import { site } from "@/content/site";
+import { Scramble } from "../ui/Scramble";
 import { projects } from "@/content/projects";
 import { pad } from "@/lib/utils";
 
@@ -79,7 +80,7 @@ export function MenuOverlay() {
                   href={l.href}
                   onClick={() => setOpen(false)}
                   aria-current={path === l.href ? "page" : undefined}
-                  className="menu-line group flex items-baseline gap-4 py-1 font-display text-[clamp(2.5rem,12vw,8.5rem)] font-semibold leading-[1.02] tracking-tight transition-all duration-300 hover:translate-x-3 hover:text-accent"
+                  className="menu-line group flex items-baseline gap-4 py-1 font-display text-[clamp(2.5rem,12vw,8.5rem)] font-medium leading-[1.02] tracking-[-0.05em] transition-all duration-300 hover:translate-x-3 hover:text-accent"
                 >
                   <span className="mono text-muted text-xs sm:text-sm">/ {pad(i + 1)}</span>
                   {l.label}
@@ -103,7 +104,7 @@ export function MenuOverlay() {
           <div>
             <p className="mono text-muted">Social</p>
             <p className="flex flex-wrap gap-x-4">
-              {site.socials.map((s) => <a key={s.label} href={socialHref(s.href)} className="hover:text-accent" target="_blank" rel="noopener noreferrer">{s.label}</a>)}
+              {site.socials.map((s) => <a key={s.label} href={s.href} className="mono hover:text-accent" target="_blank" rel="noopener noreferrer"><Scramble text={`${s.label} ↗`} /></a>)}
             </p>
           </div>
           <p className="max-w-xs text-muted sm:text-right sm:ml-auto">{site.menuTagline}</p>

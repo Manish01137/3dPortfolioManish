@@ -44,11 +44,11 @@ async function placeholder(file: string, w: number, h: number, title: string, su
   const fs1 = Math.round(Math.min(w / (title.length * 0.62), h * 0.22));
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
     <defs>
-      <radialGradient id="a" cx="15%" cy="20%" r="70%"><stop offset="0" stop-color="#C6F432" stop-opacity=".55"/><stop offset="1" stop-color="#0F0F0F" stop-opacity="0"/></radialGradient>
-      <radialGradient id="b" cx="90%" cy="90%" r="60%"><stop offset="0" stop-color="#4B3BFF" stop-opacity=".5"/><stop offset="1" stop-color="#0F0F0F" stop-opacity="0"/></radialGradient>
+      <radialGradient id="a" cx="15%" cy="20%" r="70%"><stop offset="0" stop-color="#819FFE" stop-opacity=".5"/><stop offset="1" stop-color="#0F0F0F" stop-opacity="0"/></radialGradient>
+      <radialGradient id="b" cx="90%" cy="90%" r="60%"><stop offset="0" stop-color="#002BBA" stop-opacity=".6"/><stop offset="1" stop-color="#0F0F0F" stop-opacity="0"/></radialGradient>
     </defs>
     <rect width="100%" height="100%" fill="#141414"/><rect width="100%" height="100%" fill="url(#a)"/><rect width="100%" height="100%" fill="url(#b)"/>
-    <text x="${w * 0.06}" y="${h * 0.12}" font-family="monospace" font-size="${Math.round(h * 0.028)}" fill="#F2F0EB" opacity=".6" letter-spacing="3">SHAPE-360* — ${esc(sub.toUpperCase())}</text>
+    <text x="${w * 0.06}" y="${h * 0.12}" font-family="monospace" font-size="${Math.round(h * 0.028)}" fill="#F2F0EB" opacity=".6" letter-spacing="3">MANISH BENIWAL — ${esc(sub.toUpperCase())}</text>
     <text x="${w * 0.06}" y="${h * 0.9}" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="${fs1}" fill="#F2F0EB" letter-spacing="-2">${esc(title)}</text>
   </svg>`;
   await sharp(Buffer.from(svg)).webp({ quality: 82 }).toFile(file);

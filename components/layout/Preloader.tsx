@@ -26,13 +26,13 @@ export function Preloader() {
   }, { scope: root });
 
   if (!show) return null;
-  const word = "Shape-360";
+  const word = "Manish Beniwal";
   return (
     <div ref={root} className="fixed inset-0 z-[300] bg-bg" style={{ clipPath: "inset(0 0 0% 0)" }} aria-hidden>
       <div className="pre-word absolute inset-0 grid place-items-center">
-        <p className="font-display flex text-[clamp(2.5rem,9vw,7rem)] font-semibold tracking-tight">
+        <p className="font-display flex text-[clamp(2.2rem,8vw,7rem)] font-medium tracking-[-0.05em]">
           {word.split("").map((c, i) => (
-            <span key={i} className="overflow-hidden"><span className="pre-letter inline-block">{c}</span></span>
+            <span key={i} className="overflow-hidden"><span className="pre-letter inline-block">{c === " " ? "\u00A0" : c}</span></span>
           ))}
           <span className="overflow-hidden"><span className="pre-letter inline-block text-accent">*</span></span>
         </p>

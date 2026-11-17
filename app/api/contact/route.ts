@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
   const resend = new Resend(key);
   const { error } = await resend.emails.send({
-    from: process.env.CONTACT_FROM ?? "Shape-360 Portfolio <onboarding@resend.dev>",
+    from: process.env.CONTACT_FROM ?? "Manish Beniwal Portfolio <onboarding@resend.dev>",
     to: process.env.CONTACT_TO ?? "manish@shape360ai.com",
     replyTo: d.email,
     subject: `New enquiry — ${d.name}${d.company ? ` (${d.company})` : ""}`,

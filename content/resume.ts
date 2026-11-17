@@ -3,8 +3,8 @@ export const experience = [
     n: "01",
     range: "2024 — Present",
     title: "Founder & Lead Developer",
-    org: "Shape-360",
-    href: "https://shape-360.com",
+    org: "Independent studio, Bangalore", // TODO verify how you want the studio named
+    href: "",
     text: "Built 70+ projects for clients in 6+ countries while leading a team of 6+ specialists.",
   },
   {

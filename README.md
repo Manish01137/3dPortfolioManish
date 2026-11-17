@@ -1,6 +1,6 @@
-# Manish Beniwal — Shape-360 portfolio
+# Manish Beniwal — portfolio
 
-Personal + agency portfolio for Manish Beniwal, Founder of Shape-360.
+Personal portfolio for Manish Beniwal — web, e-commerce & AI developer (Bangalore).
 Next.js 15 (App Router) · TypeScript · Tailwind CSS v4 · GSAP (ScrollTrigger, SplitText) · Lenis · next-themes.
 
 ## Setup
@@ -20,7 +20,7 @@ Requires Node 20+. TypeScript is pinned to 5.x (Next 15's config loader does not
 |---|---|
 | `RESEND_API_KEY` | Sends contact-form emails via [Resend](https://resend.com). **Without it** the API returns 501 and the form opens a pre-filled `mailto:` instead. |
 | `CONTACT_TO` | Inbox that receives enquiries (default `manish@shape360ai.com`). |
-| `CONTACT_FROM` | Verified Resend sender, e.g. `Shape-360 <hello@shape360ai.com>`. |
+| `CONTACT_FROM` | Verified Resend sender, e.g. `Manish Beniwal <hello@yourdomain.com>`. |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL used for metadata, sitemap and JSON-LD. |
 
 ## Editing content
@@ -29,12 +29,12 @@ All copy lives in `/content` — components contain no hard-coded copy.
 
 | File | What it holds |
 |---|---|
-| `site.ts` | Identity, contact details, **social links** (fill the empty `href`s), availability badge, `showTestimonials` flag |
+| `site.ts` | Identity, contact details, social links (LinkedIn, GitHub), availability badge, `showTestimonials` flag |
 | `projects.ts` | All projects, filters, featured flag |
 | `services.ts` | Services list, prices, FAQ |
 | `resume.ts` | Experience, education, certifications, values |
 | `stats.ts` | Counters + 3-step process |
-| `tools.ts` | Favourite tools grid, free tools strip |
+| `tools.ts` | Favourite tools grid |
 | `testimonials.ts` | **Placeholders only.** Replace with real quotes, then set `showTestimonials: true` in `site.ts` |
 
 Search the codebase for `TODO verify` / `TODO add` to find every unconfirmed fact.
@@ -67,9 +67,21 @@ The detail page `/work/<slug>` is generated automatically (static params + metad
 - Custom cursor, image cursor-trail and magnetic buttons only run on fine pointers (`hover: hover` and `pointer: fine`).
 - Add `data-cursor="LABEL"` to any element to show a label in the cursor ring.
 
+## 3D / motion pieces
+
+| Where | Effect | File |
+|---|---|---|
+| Hero | Pinned 3D fly-through of real project screenshots (CSS perspective), mouse-tilted world, name breaks apart in 3D, tagline assembles | `components/sections/Hero.tsx` |
+| Selected work, /work | 3D tilt cards with glare; a phone with the mobile build lifts off the card on hover | `components/ui/Tilt.tsx`, `components/work/ProjectTile.tsx` |
+| "Built to grow" band | Pinned image grows from a small window to full screen over a giant mono marquee | `components/sections/ScaleReveal.tsx` |
+| Services | Full-screen sticky slides; the previous one sinks back in 3D | `components/sections/ServicesStack.tsx` |
+| Process | Perspective list — rows tip back with blur as they leave | `components/sections/Process.tsx` |
+| Closing CTA | Rotating 3D ring of project screenshots (speeds up with scroll) | `components/sections/CTA.tsx` |
+| Links | Text scramble on hover | `components/ui/Scramble.tsx` |
+
 ## Fonts
 
-The display face is **Syne** (via `next/font/google`, self-hosted at build). To use Clash Display / General Sans from Fontshare, download the woff2 files into `app/fonts/`, load them with `next/font/local` in `app/layout.tsx`, and keep the `--f-display` variable name.
+**Manrope** (display + body) and **JetBrains Mono** (labels, giant wordmarks), both via `next/font/google` (self-hosted at build).
 
 ## Deploy to Vercel
 

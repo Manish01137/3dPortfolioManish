@@ -32,7 +32,7 @@ export const services: Service[] = [
     description: "CMS-driven sites and blogs with security hardening and SEO foundations built in.",
     tags: ["CMS", "Blogs", "Security", "SEO"],
     from: "From $499",
-    image: "kvs-academy",
+    image: "go-everywhere-trips",
   },
   {
     n: "04",
@@ -58,7 +58,7 @@ export const services: Service[] = [
       "Logo, brand identity and copywriting, backed by a dedicated account manager, weekly reports and 24/7 communication.",
     tags: ["Logo", "Identity", "Copywriting", "Support"],
     from: "Custom quote",
-    image: "shanta-samanta",
+    image: "glowrithm-media",
   },
 ];
 

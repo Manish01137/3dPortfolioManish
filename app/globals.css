@@ -1,27 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0f0f0f;
-  --bg-elev: #171717;
-  --fg: #f2f0eb;
-  --muted: #8a8a85;
-  --line: rgba(255, 255, 255, 0.1);
-  --accent: #c6f432;
-  --accent-fg: #0f0f0f;
+  /* Light (default) — warm editorial grey */
+  --bg: #eeeae8;
+  --bg-elev: #f9f7f7;
+  --fg: #121212;
+  --muted: #575960;
+  --line: rgba(15, 15, 15, 0.12);
+  --accent: #002bba;
+  --accent-fg: #ffffff;
   --pad: clamp(1.25rem, 4vw, 4rem);
   --section: clamp(6rem, 14vw, 12rem);
-  color-scheme: dark;
-}
-[data-theme="light"] {
-  --bg: #f4f2ee;
-  --bg-elev: #ffffff;
-  --fg: #111111;
-  --muted: #6b6b66;
-  --line: rgba(0, 0, 0, 0.1);
-  --accent: #4b3bff;
-  --accent-fg: #ffffff;
   color-scheme: light;
 }
+[data-theme="dark"], .theme-dark {
+  --bg: #0f0f0f;
+  --bg-elev: #171719;
+  --fg: #f4f2ee;
+  --muted: #8e93a1;
+  --line: rgba(255, 255, 255, 0.12);
+  --accent: #819ffe;
+  --accent-fg: #0f0f0f;
+  color-scheme: dark;
+}
+/* Always-dark band inside either theme */
+.theme-dark { background: var(--bg); color: var(--fg); }
 
 @theme inline {
   --color-bg: var(--bg);
@@ -30,8 +33,8 @@
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
-  --font-display: var(--f-display), "Syne", system-ui, sans-serif;
-  --font-sans: var(--f-body), system-ui, sans-serif;
+  --font-display: var(--f-display), system-ui, sans-serif;
+  --font-sans: var(--f-display), system-ui, sans-serif;
   --font-mono: var(--f-mono), ui-monospace, monospace;
 }
 
@@ -43,7 +46,7 @@ html.lenis, html.lenis body { height: auto; }
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--f-body), system-ui, sans-serif;
+  font-family: var(--f-display), system-ui, sans-serif;
   font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
   line-height: 1.55;
   overflow-x: clip;
@@ -56,7 +59,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 
 .container-x { max-width: 1600px; margin-inline: auto; padding-inline: var(--pad); }
 .section { padding-block: var(--section); }
-.font-display { font-family: var(--f-display), "Syne", sans-serif; }
+.font-display { font-family: var(--f-display), sans-serif; }
 
 .mono {
   font-family: var(--f-mono), ui-monospace, monospace;
@@ -66,25 +69,53 @@ a, button { -webkit-tap-highlight-color: transparent; }
   line-height: 1.4;
 }
 .h-hero {
-  font-family: var(--f-display), "Syne", sans-serif;
-  font-weight: 600;
+  font-family: var(--f-display), sans-serif;
+  font-weight: 500;
   font-size: clamp(3rem, 11vw, 11rem);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
 }
 .t-h2 {
-  font-family: var(--f-display), "Syne", sans-serif;
-  font-weight: 600;
-  font-size: clamp(2.25rem, 6vw, 5.5rem);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-family: var(--f-display), sans-serif;
+  font-weight: 500;
+  font-size: clamp(2.25rem, 5.6vw, 5.25rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
+/* Giant monospace wordmarks / marquee type */
+.t-mono-xl {
+  font-family: var(--f-mono), ui-monospace, monospace;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  text-transform: uppercase;
+}
+/* "[ LABEL ]" bracket labels */
+.bracket::before { content: "[ "; }
+.bracket::after { content: " ]"; }
+
+/* Scroll word reveal (RevealText) */
+.rv-word { --p: 1; color: color-mix(in srgb, var(--fg) calc(var(--p) * 100%), var(--muted)); }
+
+/* 3D helpers */
+.persp-1000 { perspective: 1000px; }
+.persp-1600 { perspective: 1600px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+
+/* 3D tilt card */
+.tilt { transform-style: preserve-3d; will-change: transform; }
+.tilt-glare {
+  pointer-events: none; position: absolute; inset: 0; opacity: 0; transition: opacity .4s ease;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.35), transparent 55%);
+  mix-blend-mode: soft-light;
+}
+.tilt-host:hover .tilt-glare { opacity: 1; }
 .hairline { border-color: var(--line); }
 
 /* Split text: hidden until JS has split it (noscript restores) */
 .js-split { visibility: hidden; }
 html[data-pre="seen"] .split-ready { visibility: hidden; }
-.split-mask { overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
 
 /* Film grain */
 .grain {
@@ -106,16 +137,6 @@ html[data-pre="seen"] .split-ready { visibility: hidden; }
 @keyframes gradient-pan { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
 .pulse-dot { animation: pulse-dot 1.6s ease-out infinite; }
-
-/* Horizontal process track: pinned only on desktop w/ motion */
-.hscroll-track { display: grid; gap: 1.5rem; }
-@media (min-width: 1024px) {
-  .hscroll-track { grid-template-columns: repeat(3, 1fr); }
-}
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .hscroll-track { display: flex; width: max-content; gap: 0; }
-  .hscroll-panel { width: 60vw; max-width: 900px; flex: none; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none !important; }
