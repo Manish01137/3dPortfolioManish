@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { ArrowUp, ArrowUpRight } from "lucide-react";
-import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, useGSAP, prefersReducedMotion, isFinePointer } from "@/lib/gsap";
 import { site } from "@/content/site";
 import { featured } from "@/content/projects";
 import { pad } from "@/lib/utils";
@@ -13,10 +13,83 @@ export function Footer() {
   const root = useRef<HTMLElement>(null);
   useGSAP(() => {
     if (prefersReducedMotion()) return;
-    gsap.from(".wordmark-char", {
+    const footer = root.current!;
+    const wrap = footer.querySelector<HTMLElement>(".wordmark-wrap")!;
+    const cells = gsap.utils.toArray<HTMLElement>(".wordmark-cell", footer);
+    const chars = gsap.utils.toArray<HTMLElement>(".wordmark-char", footer);
+
+    // ── Cursor proximity: letters near the pointer swell in weight, lift and tint toward the accent ──
+    const n = chars.length;
+    const cur = new Float32Array(n); // eased 0..1 influence per letter
+    const centers = new Float32Array(n); // letter centre x, relative to the wordmark
+    const ptr = { x: -1e5, y: -1e5, on: false }; // pointer, relative to the wordmark
+    let rowY = 0, sigma = 1, live = false, running = false;
+
+    const measure = () => {
+      const r = wrap.getBoundingClientRect();
+      cells.forEach((c, i) => { const b = c.getBoundingClientRect(); centers[i] = b.left - r.left + b.width / 2; rowY = b.top - r.top + b.height / 2; });
+      sigma = Math.max(40, r.width * 0.075); // spread of the bulge ≈ 2 letters
+    };
+
+    const tick = () => {
+      const ease = 1 - Math.pow(0.82, gsap.ticker.deltaRatio()); // frame-rate independent smoothing
+      const dy = ptr.y - rowY;
+      const vy = ptr.on ? Math.exp(-(dy * dy) / (2 * (sigma * 2.2) ** 2)) : 0; // fade as the pointer moves away vertically
+      let moving = ptr.on;
+      for (let i = 0; i < n; i++) {
+        const dx = ptr.x - centers[i];
+        const target = vy * Math.exp(-(dx * dx) / (2 * sigma * sigma));
+        const v = cur[i] + (target - cur[i]) * ease;
+        if (Math.abs(v - cur[i]) < 0.0005 && target < 0.001) { if (cur[i] !== 0) { cur[i] = 0; paint(i, 0); } continue; }
+        cur[i] = v; moving = true; paint(i, v);
+      }
+      if (!moving) { gsap.ticker.remove(tick); running = false; }
+    };
+    const paint = (i: number, v: number) => {
+      const s = chars[i].style;
+      s.fontWeight = String(Math.round(400 + 400 * v));
+      s.color = v < 0.002 ? "" : `color-mix(in srgb, var(--accent) ${(v * 100).toFixed(1)}%, var(--fg))`;
+      cells[i].style.transform = v < 0.002 ? "" : `translateY(${(-12 * v).toFixed(2)}%) scaleY(${(1 + 0.08 * v).toFixed(3)})`;
+    };
+    const start = () => { if (!running) { running = true; gsap.ticker.add(tick); } };
+
+    const move = (e: PointerEvent) => {
+      if (!live) return;
+      const r = wrap.getBoundingClientRect();
+      ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top; ptr.on = true;
+      start();
+    };
+    const leave = () => { ptr.on = false; start(); };
+
+    // A single weight wave sweeps across once the reveal lands, hinting that the letters are alive (also the touch-screen version).
+    const wave = () => {
+      measure();
+      ptr.y = rowY;
+      gsap.fromTo(ptr, { x: -sigma * 3 }, {
+        x: wrap.clientWidth + sigma * 3, duration: 1.8, ease: "power2.inOut",
+        onStart: () => { ptr.on = true; start(); },
+        onComplete: () => { ptr.on = false; live = isFinePointer(); },
+      });
+    };
+
+    gsap.from(chars, {
       yPercent: 110, duration: 1.2, ease: "power4.out", stagger: 0.04,
-      scrollTrigger: { trigger: ".wordmark-wrap", start: "top 95%", once: true },
+      scrollTrigger: { trigger: wrap, start: "top 95%", once: true },
+      // the clip only exists for the rise-in; let bolder/lifted glyphs breathe afterwards
+      onComplete: () => { gsap.set(cells, { overflow: "visible" }); wave(); },
     });
+
+    footer.addEventListener("pointermove", move);
+    footer.addEventListener("pointerleave", leave);
+    wrap.addEventListener("pointerenter", measure);
+    window.addEventListener("resize", measure);
+    return () => {
+      gsap.ticker.remove(tick);
+      footer.removeEventListener("pointermove", move);
+      footer.removeEventListener("pointerleave", leave);
+      wrap.removeEventListener("pointerenter", measure);
+      window.removeEventListener("resize", measure);
+    };
   }, { scope: root });
   const col = "mono text-muted mb-5";
   return (
@@ -53,10 +126,11 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="wordmark-wrap container-x mt-16 overflow-hidden">
+      {/* top padding leaves headroom for letters lifting under the cursor */}
+      <div className="wordmark-wrap container-x mt-10 overflow-hidden pt-[2.5vw] 2xl:pt-10">
         <p aria-hidden className="t-mono-xl flex select-none justify-between whitespace-nowrap text-[11vw] leading-[0.8] 2xl:text-[min(11vw,11.5rem)]">
           {"MANISH BENIWAL".split("").map((c, i) => (
-            <span key={i} className="inline-block overflow-hidden pb-[0.04em]"><span className="wordmark-char inline-block">{c === " " ? " " : c}</span></span>
+            <span key={i} className="wordmark-cell inline-block origin-bottom overflow-hidden pb-[0.04em]"><span className="wordmark-char inline-block">{c === " " ? " " : c}</span></span>
           ))}
         </p>
       </div>

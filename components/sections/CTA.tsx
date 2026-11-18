@@ -19,7 +19,8 @@ export function CTA() {
   useGSAP(() => {
     gsap.from(".cta-line", { yPercent: 110, duration: 1.2, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: root.current, start: "top 70%", once: true } });
     if (prefersReducedMotion()) return;
-    const spin = gsap.to(wheel.current, { rotationY: "-=360", duration: 60, repeat: -1, ease: "none" });
+    // starts paused: the trigger below only plays it while the section is on screen (it used to spin from page load)
+    const spin = gsap.to(wheel.current, { rotationY: "-=360", duration: 60, repeat: -1, ease: "none", paused: true });
     let hovering = false; // while the pointer is over the ring it eases to a stop, so cards are easy to click
     // scroll velocity speeds the ring up for a moment
     ScrollTrigger.create({

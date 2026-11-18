@@ -16,7 +16,8 @@ import { projects } from "@/content/projects";
 
 // Manrope for display + body, JetBrains Mono for labels and the giant wordmarks.
 const display = Manrope({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--f-display", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400"], variable: "--f-mono", display: "swap" });
+// Variable (100–800) so the footer wordmark can animate weight; mono keeps every glyph the same width, so nothing reflows.
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--f-mono", display: "swap" });
 
 const title = "Manish Beniwal — Web, E-commerce & AI Developer";
 

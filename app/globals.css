@@ -129,18 +129,24 @@ html[data-pre="seen"] .split-ready { visibility: hidden; }
 .marquee-track { display: flex; width: max-content; animation: marquee var(--dur, 40s) linear infinite; }
 .marquee-track.rev { animation-name: marquee-rev; }
 .marquee-wrap:hover .marquee-track.pausable { animation-play-state: paused; }
+.marquee-wrap[data-off] .marquee-track { animation-play-state: paused; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
 @keyframes scroll-line { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 @keyframes drift { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(4%,-6%,0) scale(1.1); } }
 @keyframes gradient-pan { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
-.pulse-dot { animation: pulse-dot 1.6s ease-out infinite; }
+/* Ring is a scaled pseudo-element (compositor-only) rather than an animated box-shadow, which repainted every frame. */
+@keyframes pulse-ring { from { transform: scale(1); opacity: 0.6; } to { transform: scale(3.5); opacity: 0; } }
+.pulse-dot { position: relative; }
+.pulse-dot::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--accent); animation: pulse-ring 1.6s ease-out infinite; }
+
+/* Touch screens: drop the full-screen grain layer (barely visible at phone size, costs a composite every frame). */
+@media (hover: none) { .grain { display: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none !important; }
-  .pulse-dot { animation: none; }
+  .pulse-dot::after { animation: none; opacity: 0; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
 

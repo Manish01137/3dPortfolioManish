@@ -8,6 +8,8 @@ let registered = false;
 export function registerGsap() {
   if (registered || typeof window === "undefined") return;
   gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
+  // Phones resize the viewport whenever the address bar shows/hides; re-measuring every pin then causes a visible hitch.
+  ScrollTrigger.config({ ignoreMobileResize: true });
   registered = true;
 }
 registerGsap();

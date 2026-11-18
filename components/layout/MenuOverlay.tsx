@@ -70,7 +70,7 @@ export function MenuOverlay() {
       className="fixed inset-0 z-50 overflow-hidden bg-bg"
     >
       {/* animated gradient backdrop (video-free fallback) */}
-      <div aria-hidden className="absolute inset-0 opacity-60" style={{ background: "linear-gradient(120deg, color-mix(in srgb, var(--accent) 22%, var(--bg)), var(--bg) 40%, color-mix(in srgb, var(--accent) 10%, var(--bg)) 80%)", backgroundSize: "300% 300%", animation: "gradient-pan 16s ease infinite" }} />
+      <div aria-hidden className="absolute inset-0 opacity-60" style={{ background: "linear-gradient(120deg, color-mix(in srgb, var(--accent) 22%, var(--bg)), var(--bg) 40%, color-mix(in srgb, var(--accent) 10%, var(--bg)) 80%)", backgroundSize: "300% 300%", animation: "gradient-pan 16s ease infinite", animationPlayState: open ? "running" : "paused" }} />
       <div className="container-x relative flex h-full flex-col justify-between pb-8 pt-28">
         <nav aria-label="Primary" className="my-auto">
           <ul>

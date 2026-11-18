@@ -24,6 +24,9 @@ const spots = [
   [-42, 0], [41, 2], [-20, 34], [22, -36], [-5, 36], [6, -32],
 ];
 
+// Cards dropped below 768px: the far-left/right ones sit mostly off a phone screen anyway.
+const MOBILE_SKIP = new Set([6, 7, 10, 11]);
+
 const DEPTH = 3800; // spacing of the tunnel
 const TRAVEL = DEPTH + 1100; // how far cards travel over the pinned scroll
 
@@ -33,21 +36,30 @@ export function Hero() {
 
   useGSAP((_ctx, contextSafe) => {
     const section = root.current!;
-    const cards = gsap.utils.toArray<HTMLElement>(".h3d-card", section);
     const reduce = prefersReducedMotion();
     const mobile = window.innerWidth < 768;
+    // Phones/tablets: fewer cards, no idle float, and frames are drawn only when scroll/intro actually changes something.
+    const lite = mobile || !isFinePointer();
+    const all = gsap.utils.toArray<HTMLElement>(".h3d-card", section);
+    const idx = all.map((_, i) => i).filter((i) => !(mobile && MOBILE_SKIP.has(i)));
+    const cards = idx.map((i) => all[i]);
     const spread = mobile ? 1.25 : 1;
     const base = cards.map((_, i) => -300 - i * (DEPTH / cards.length));
     const state = { p: 0, intro: reduce ? 0 : 1, t: 0 };
-    gsap.set(cards, { xPercent: -50, yPercent: -50, force3D: true });
+    const shown = cards.map(() => ({ op: -1, vis: "" }));
 
+    // Plain style writes (no per-frame gsap.set parsing); opacity/visibility only touched when they change.
     const render = () => {
       const vw = window.innerWidth / 100, vh = window.innerHeight / 100;
-      cards.forEach((c, i) => {
-        const z = base[i] + state.p * TRAVEL - state.intro * 1600;
+      cards.forEach((c, k) => {
+        const i = idx[k];
+        const z = base[k] + state.p * TRAVEL - state.intro * 1600;
         const op = z < -3300 ? Math.max(0, (z + 4300) / 1000) : z > 450 ? Math.max(0, 1 - (z - 450) / 300) : 1;
-        const bob = reduce ? 0 : Math.sin(state.t * 0.6 + i) * 8;
-        gsap.set(c, { x: spots[i][0] * vw * spread, y: spots[i][1] * vh * spread + bob, z, opacity: op, visibility: op <= 0.01 ? "hidden" : "visible" });
+        const bob = reduce || lite ? 0 : Math.sin(state.t * 0.6 + i) * 8;
+        c.style.transform = `translate3d(${(spots[i][0] * vw * spread).toFixed(1)}px,${(spots[i][1] * vh * spread + bob).toFixed(1)}px,${z.toFixed(1)}px) translate(-50%,-50%)`;
+        const s = shown[k], vis = op <= 0.01 ? "hidden" : "visible";
+        if (Math.abs(s.op - op) > 0.004) { c.style.opacity = op.toFixed(3); s.op = op; }
+        if (s.vis !== vis) { c.style.visibility = vis; s.vis = vis; }
       });
     };
     render();
@@ -57,12 +69,14 @@ export function Hero() {
       return;
     }
 
-    // idle float + render loop while the hero is on screen
+    // desktop: idle float + render loop while the hero is on screen (lite devices render on demand instead)
     const tick = (time: number) => { state.t = time; render(); };
-    ScrollTrigger.create({
+    if (!lite) ScrollTrigger.create({
       trigger: section, start: "top bottom", end: "bottom top",
       onToggle: (s) => (s.isActive ? gsap.ticker.add(tick) : gsap.ticker.remove(tick)),
     });
+    const onDemand = lite ? render : undefined;
+    if (lite) window.addEventListener("resize", render);
 
     // mouse → rotate the whole 3D world
     let move: ((e: PointerEvent) => void) | undefined;
@@ -90,7 +104,7 @@ export function Hero() {
 
       // entrance (after the preloader)
       off = whenReady(contextSafe!(() => {
-        gsap.to(state, { intro: 0, duration: 2.2, ease: "expo.out" });
+        gsap.to(state, { intro: 0, duration: 2.2, ease: "expo.out", onUpdate: onDemand });
         gsap.to(split!.chars, { opacity: 1, yPercent: 0, rotationX: 0, duration: 1.2, stagger: 0.035, ease: "expo.out", delay: 0.15 });
         gsap.fromTo(".hero-fade", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1, stagger: 0.08, delay: 0.5, ease: "power3.out", overwrite: "auto" });
         // translate-only (never opacity 0) so the paragraph can register as LCP immediately
@@ -101,7 +115,7 @@ export function Hero() {
       // fromTo + immediateRender:false so this scrubbed exit never fights the entrance tween
       const exitChars = split.chars;
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: section, start: "top top", end: "+=220%", pin: true, scrub: 1, refreshPriority: 1, onUpdate: (s) => { state.p = s.progress; } },
+        scrollTrigger: { trigger: section, start: "top top", end: "+=220%", pin: true, scrub: 1, refreshPriority: 1, onUpdate: (s) => { state.p = s.progress; onDemand?.(); } },
       });
       tl.fromTo(exitChars, { opacity: 1, z: 0, rotationX: 0, yPercent: 0 }, { opacity: 0, z: 400, rotationX: 70, yPercent: -40, stagger: { each: 0.02, from: "center" }, duration: 0.35, ease: "power2.in", immediateRender: false }, 0.02)
         .fromTo(".hero-fade, .hero-bottom", { opacity: 1 }, { opacity: 0, duration: 0.2, immediateRender: false }, 0.05)
@@ -114,6 +128,7 @@ export function Hero() {
       cancelled = true;
       off();
       gsap.ticker.remove(tick);
+      window.removeEventListener("resize", render);
       if (move) section.removeEventListener("pointermove", move);
       split?.revert();
       outro?.revert();
@@ -128,7 +143,7 @@ export function Hero() {
       <div aria-hidden className="absolute inset-0" style={{ perspective: "900px" }}>
         <div ref={world} className="preserve-3d absolute inset-0">
           {shots.map((s, i) => (
-            <div key={i} className={`h3d-card absolute left-1/2 top-1/2 overflow-hidden bg-elev shadow-[0_40px_80px_-30px_rgba(0,0,0,.45)] ${s.portrait ? "aspect-[390/844] w-[22vw] sm:w-[12vw] lg:w-[9vw]" : "aspect-[16/10] w-[46vw] sm:w-[30vw] lg:w-[22vw]"} max-w-[400px]`}>
+            <div key={i} className={`h3d-card absolute left-1/2 top-1/2 overflow-hidden bg-elev ring-1 ring-line md:ring-0 md:shadow-[0_40px_80px_-30px_rgba(0,0,0,.45)] ${MOBILE_SKIP.has(i) ? "max-md:hidden" : ""} ${s.portrait ? "aspect-[390/844] w-[22vw] sm:w-[12vw] lg:w-[9vw]" : "aspect-[16/10] w-[46vw] sm:w-[30vw] lg:w-[22vw]"} max-w-[400px]`}>
               <Image src={s.src} alt="" fill sizes="(max-width:768px) 46vw, 22vw" quality={60} className="object-cover object-top" priority={i < 4} />
             </div>
           ))}
@@ -143,7 +158,7 @@ export function Hero() {
             <Image src="/me-avatar.jpg" alt="" width={56} height={56} priority className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-[var(--line)] sm:h-14 sm:w-14" />
             <p className="mono text-[0.66rem] text-muted sm:text-xs">[ Developer · E-commerce · AI tools ]<br />Hello! I&apos;m {site.name} —</p>
           </div>
-          <p className="mono pointer-events-auto inline-flex items-center gap-3 rounded-full border border-line bg-bg/70 px-4 py-2 backdrop-blur">
+          <p className="mono pointer-events-auto inline-flex items-center gap-3 rounded-full border border-line bg-bg/90 px-4 py-2 md:bg-bg/70 md:backdrop-blur">
             <span className="pulse-dot h-2 w-2 rounded-full bg-accent" aria-hidden />
             {site.availability}
           </p>
