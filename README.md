@@ -91,3 +91,4 @@ The detail page `/work/<slug>` is generated automatically (static params + metad
 4. Deploy. Point your domain at the project and update `NEXT_PUBLIC_SITE_URL`.
 
 Fully static export (`output: "export"`) is possible if you drop `app/api/contact` (use the mailto fallback) and set `images.unoptimized = true`.
+# 3dPortfolioManish
