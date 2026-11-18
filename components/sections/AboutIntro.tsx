@@ -12,8 +12,8 @@ export function AboutIntro() {
   const root = useRef<HTMLElement>(null);
   useGSAP(() => {
     if (prefersReducedMotion()) return;
-    gsap.fromTo(".portrait", { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 1.3, ease: "power4.out", scrollTrigger: { trigger: ".portrait", start: "top 85%", once: true } });
-    gsap.fromTo(".portrait img", { scale: 1.3 }, { scale: 1, duration: 1.6, ease: "power3.out", scrollTrigger: { trigger: ".portrait", start: "top 85%", once: true } });
+    gsap.fromTo(".portrait", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.5, ease: "expo.inOut", scrollTrigger: { trigger: ".portrait", start: "top 85%", once: true } });
+    gsap.fromTo(".portrait img", { scale: 1.35 }, { scale: 1, duration: 1.9, ease: "expo.out", scrollTrigger: { trigger: ".portrait", start: "top 85%", once: true } });
   }, { scope: root });
   return (
     <section id="about" ref={root} className="section container-x scroll-mt-20">
@@ -26,8 +26,8 @@ export function AboutIntro() {
         </div>
         <div className="lg:col-span-4">
           <Tilt max={7}>
-            <div className="portrait relative aspect-[4/5] overflow-hidden bg-elev">
-              <Image src="/me.jpg" alt="Portrait of Manish Beniwal" fill sizes="(min-width:1024px) 30vw, 90vw" className="object-cover" />
+            <div className="portrait relative aspect-[4/5] overflow-hidden bg-[#141414]">
+              <Image src="/me.jpg" alt="Portrait of Manish Beniwal" fill sizes="(min-width:1024px) 30vw, 90vw" className="object-cover object-top" />
             </div>
             <span className="mono absolute -bottom-4 left-4 bg-accent px-3 py-2 text-[var(--accent-fg)] [transform:translateZ(70px)]">Bangalore, IN</span>
           </Tilt>

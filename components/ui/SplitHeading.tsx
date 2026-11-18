@@ -8,14 +8,14 @@ type Props = { as?: ElementType; className?: string; children: React.ReactNode; 
 /** Line-masked reveal. `trigger="ready"` waits for the preloader. */
 export function SplitHeading({ as: Tag = "h2", className = "", children, trigger = "scroll", delay = 0 }: Props) {
   const ref = useRef<HTMLElement>(null);
-  useGSAP(() => {
+  useGSAP((_ctx, contextSafe) => {
     const el = ref.current;
     if (!el) return;
     if (prefersReducedMotion()) { el.style.visibility = "visible"; return; }
     let split: SplitText | undefined;
     let off = () => {};
     let cancelled = false;
-    fontsReady().then(() => {
+    fontsReady().then(contextSafe!(() => {
       if (cancelled) return;
       split = SplitText.create(el, {
         type: "lines",
@@ -32,11 +32,11 @@ export function SplitHeading({ as: Tag = "h2", className = "", children, trigger
             paused: trigger === "ready",
             scrollTrigger: trigger === "scroll" ? { trigger: el, start: "top 88%", once: true } : undefined,
           });
-          if (trigger === "ready") off = whenReady(() => tween.play());
+          if (trigger === "ready") off = whenReady(contextSafe!(() => { tween.play(); }));
           return tween;
         },
       });
-    });
+    }));
     return () => { cancelled = true; off(); split?.revert(); };
   }, { scope: ref });
   // "ready" headings paint immediately on first visit (under the preloader → early LCP);

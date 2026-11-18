@@ -9,6 +9,7 @@ import { MenuOverlay } from "@/components/layout/MenuOverlay";
 import { Footer } from "@/components/layout/Footer";
 import { Preloader } from "@/components/layout/Preloader";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
+import { PageTransition } from "@/components/layout/PageTransition";
 import { Cursor } from "@/components/ui/Cursor";
 import { site } from "@/content/site";
 import { projects } from "@/content/projects";
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MenuProvider>
             <SmoothScroll />
             <Preloader />
+            <PageTransition />
             <ScrollProgress />
             <Cursor />
             <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[400] focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-[var(--accent-fg)]">Skip to content</a>

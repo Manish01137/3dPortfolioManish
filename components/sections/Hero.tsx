@@ -31,7 +31,7 @@ export function Hero() {
   const root = useRef<HTMLElement>(null);
   const world = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
+  useGSAP((_ctx, contextSafe) => {
     const section = root.current!;
     const cards = gsap.utils.toArray<HTMLElement>(".h3d-card", section);
     const reduce = prefersReducedMotion();
@@ -65,16 +65,21 @@ export function Hero() {
     });
 
     // mouse → rotate the whole 3D world
+    let move: ((e: PointerEvent) => void) | undefined;
     if (isFinePointer()) {
-      const ry = gsap.quickTo(world.current, "rotationY", { duration: 1.2, ease: "power3" });
-      const rx = gsap.quickTo(world.current, "rotationX", { duration: 1.2, ease: "power3" });
-      const move = (e: PointerEvent) => { ry((e.clientX / innerWidth - 0.5) * 14); rx(-(e.clientY / innerHeight - 0.5) * 10); };
+      const ry = gsap.quickTo(world.current, "rotationY", { duration: 1.4, ease: "power3" });
+      const rx = gsap.quickTo(world.current, "rotationX", { duration: 1.4, ease: "power3" });
+      move = (e: PointerEvent) => { ry((e.clientX / innerWidth - 0.5) * 14); rx(-(e.clientY / innerHeight - 0.5) * 10); };
       section.addEventListener("pointermove", move);
     }
 
     let split: SplitText | undefined, outro: SplitText | undefined;
     let off = () => {};
-    fontsReady().then(() => {
+    let cancelled = false;
+    // Everything created after the await must join the GSAP context (contextSafe),
+    // otherwise the scroll pin is never reverted and React crashes on navigation.
+    fontsReady().then(contextSafe!(() => {
+      if (cancelled) return;
       const h1 = section.querySelector<HTMLElement>(".hero-name")!;
       split = SplitText.create(h1, { type: "chars", charsClass: "inline-block" });
       outro = SplitText.create(section.querySelector(".hero-outro p")!, { type: "words", wordsClass: "inline-block", aria: "none" });
@@ -84,13 +89,13 @@ export function Hero() {
       section.querySelector<HTMLElement>(".hero-outro")!.style.opacity = "1";
 
       // entrance (after the preloader)
-      off = whenReady(() => {
+      off = whenReady(contextSafe!(() => {
         gsap.to(state, { intro: 0, duration: 2.2, ease: "expo.out" });
         gsap.to(split!.chars, { opacity: 1, yPercent: 0, rotationX: 0, duration: 1.2, stagger: 0.035, ease: "expo.out", delay: 0.15 });
         gsap.fromTo(".hero-fade", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1, stagger: 0.08, delay: 0.5, ease: "power3.out", overwrite: "auto" });
         // translate-only (never opacity 0) so the paragraph can register as LCP immediately
         gsap.fromTo(".hero-bottom", { y: 40 }, { y: 0, duration: 1.2, delay: 0.55, ease: "power3.out" });
-      });
+      }));
 
       // pinned fly-through: name breaks apart, cards rush past, tagline assembles
       // fromTo + immediateRender:false so this scrubbed exit never fights the entrance tween
@@ -103,12 +108,21 @@ export function Hero() {
         .to(outro.words, { opacity: 1, y: 0, rotationX: 0, stagger: 0.03, duration: 0.3, ease: "power3.out" }, 0.5)
         .to({}, { duration: 0.2 });
       ScrollTrigger.refresh();
-    });
+    }));
 
-    return () => { off(); gsap.ticker.remove(tick); split?.revert(); outro?.revert(); };
+    return () => {
+      cancelled = true;
+      off();
+      gsap.ticker.remove(tick);
+      if (move) section.removeEventListener("pointermove", move);
+      split?.revert();
+      outro?.revert();
+    };
   }, { scope: root });
 
+  // The wrapper div keeps React's parent stable while ScrollTrigger wraps the section in a pin-spacer.
   return (
+    <div>
     <section ref={root} className="relative h-[100svh] overflow-hidden" aria-label="Introduction">
       {/* 3D tunnel of real project screenshots */}
       <div aria-hidden className="absolute inset-0" style={{ perspective: "900px" }}>
@@ -125,7 +139,10 @@ export function Hero() {
 
       <div className="container-x pointer-events-none relative z-10 flex h-full w-full flex-col justify-between pb-6 pt-28">
         <div className="hero-fade flex flex-wrap items-start justify-between gap-4">
-          <p className="mono text-muted">[ Developer · E-commerce · AI tools ]<br />Hello! I&apos;m {site.name} —</p>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Image src="/me-avatar.jpg" alt="" width={56} height={56} priority className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-[var(--line)] sm:h-14 sm:w-14" />
+            <p className="mono text-[0.66rem] text-muted sm:text-xs">[ Developer · E-commerce · AI tools ]<br />Hello! I&apos;m {site.name} —</p>
+          </div>
           <p className="mono pointer-events-auto inline-flex items-center gap-3 rounded-full border border-line bg-bg/70 px-4 py-2 backdrop-blur">
             <span className="pulse-dot h-2 w-2 rounded-full bg-accent" aria-hidden />
             {site.availability}
@@ -156,5 +173,6 @@ export function Hero() {
         </div>
       </div>
     </section>
+    </div>
   );
 }

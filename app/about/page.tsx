@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PageIntro } from "@/components/work/PageIntro";
 import { Journey } from "@/components/sections/Journey";
 import { Stats } from "@/components/sections/Stats";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { RevealText } from "@/components/ui/RevealText";
 import { Button } from "@/components/ui/Button";
+import { Portrait } from "@/components/ui/Portrait";
 import { CTA } from "@/components/sections/CTA";
 import { values } from "@/content/resume";
 import { site } from "@/content/site";
@@ -18,8 +18,9 @@ export default function About() {
     <>
       <PageIntro eyebrow="About" title={<>Developer.<br />Founder.</>} lead={`${site.role} — ${site.tagline}.`} />
       <section className="container-x grid gap-12 pb-[var(--section)] lg:grid-cols-12">
-        <div className="relative aspect-[4/5] overflow-hidden bg-elev lg:col-span-5">
-          <Image src="/me.jpg" alt="Portrait of Manish Beniwal" fill priority sizes="(min-width:1024px) 40vw, 92vw" className="object-cover" />
+        <div className="lg:col-span-5">
+          <Portrait priority />
+          <p className="mono mt-4 flex justify-between text-muted"><span>{site.name}</span><span>{site.location}</span></p>
         </div>
         <div className="lg:col-span-6 lg:col-start-7">
           <Eyebrow>The story</Eyebrow>

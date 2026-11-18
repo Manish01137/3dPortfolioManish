@@ -20,17 +20,31 @@ export function CTA() {
     gsap.from(".cta-line", { yPercent: 110, duration: 1.2, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: root.current, start: "top 70%", once: true } });
     if (prefersReducedMotion()) return;
     const spin = gsap.to(wheel.current, { rotationY: "-=360", duration: 60, repeat: -1, ease: "none" });
+    let hovering = false; // while the pointer is over the ring it eases to a stop, so cards are easy to click
     // scroll velocity speeds the ring up for a moment
     ScrollTrigger.create({
       trigger: root.current, start: "top bottom", end: "bottom top",
-      onUpdate: (s) => { gsap.to(spin, { timeScale: 1 + Math.min(Math.abs(s.getVelocity()) / 250, 8), duration: 0.2, overwrite: true, onComplete: () => { gsap.to(spin, { timeScale: 1, duration: 1.2 }); } }); },
+      onUpdate: (s) => {
+        if (hovering) return;
+        gsap.to(spin, { timeScale: 1 + Math.min(Math.abs(s.getVelocity()) / 250, 6), duration: 0.3, overwrite: true, onComplete: () => { gsap.to(spin, { timeScale: 1, duration: 1.4, ease: "power2.out" }); } });
+      },
       onToggle: (s) => (s.isActive ? spin.play() : spin.pause()),
     });
-    if (isFinePointer()) {
-      const tilt = gsap.quickTo(".ring-tilt", "rotationX", { duration: 1, ease: "power3" });
-      const move = (e: PointerEvent) => tilt(-6 - (e.clientY / innerHeight - 0.5) * 12);
-      root.current!.addEventListener("pointermove", move);
-    }
+    if (!isFinePointer()) return;
+    const el = root.current!;
+    const stage = el.querySelector<HTMLElement>(".ring-stage")!;
+    const tilt = gsap.quickTo(".ring-tilt", "rotationX", { duration: 1, ease: "power3" });
+    const move = (e: PointerEvent) => tilt(-6 - (e.clientY / innerHeight - 0.5) * 12);
+    const enter = () => { hovering = true; gsap.to(spin, { timeScale: 0, duration: 0.8, ease: "power3.out", overwrite: true }); };
+    const leave = () => { hovering = false; gsap.to(spin, { timeScale: 1, duration: 1.2, ease: "power2.inOut", overwrite: true }); };
+    el.addEventListener("pointermove", move);
+    stage.addEventListener("pointerenter", enter);
+    stage.addEventListener("pointerleave", leave);
+    return () => {
+      el.removeEventListener("pointermove", move);
+      stage.removeEventListener("pointerenter", enter);
+      stage.removeEventListener("pointerleave", leave);
+    };
   }, { scope: root });
 
   return (
@@ -51,7 +65,7 @@ export function CTA() {
       </div>
 
       {/* 3D ring */}
-      <div className="relative mt-4 h-[clamp(260px,34vw,520px)]" style={{ perspective: "1400px", ["--w" as string]: "clamp(150px, 19vw, 300px)" }}>
+      <div className="ring-stage relative mt-4 h-[clamp(260px,34vw,520px)]" style={{ perspective: "1400px", ["--w" as string]: "clamp(150px, 19vw, 300px)" }}>
         <div className="ring-tilt preserve-3d absolute inset-0" style={{ transform: "rotateX(-6deg)" }}>
           <div ref={wheel} className="preserve-3d absolute left-1/2 top-1/2 h-0 w-0">
             {ring.map((p, i) => (

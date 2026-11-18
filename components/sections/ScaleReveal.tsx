@@ -29,6 +29,7 @@ export function ScaleReveal() {
 
   const row = site.disciplines.map((d) => `${d}/`).join("");
   return (
+    <div>
     <section ref={root} className="theme-dark relative h-[100svh] overflow-hidden" aria-label="What I do">
       <div aria-hidden className="absolute inset-0 flex flex-col justify-center gap-2 text-[color:var(--bg-elev)]">
         {[0, 1, 2].map((i) => (
@@ -49,5 +50,6 @@ export function ScaleReveal() {
         <ul className="mono space-y-1 text-right text-[0.7rem] text-white/80">{right.map((l) => <li key={l} className="sr-label">{l}</li>)}</ul>
       </div>
     </section>
+    </div>
   );
 }

@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { LayoutGrid, List } from "lucide-react";
-import { gsap, useGSAP, isFinePointer } from "@/lib/gsap";
+import { gsap, useGSAP, isFinePointer, prefersReducedMotion } from "@/lib/gsap";
+import { whenReady } from "@/lib/ready";
 import { filters, projects, type FilterKey } from "@/content/projects";
 import { ProjectTile } from "./ProjectTile";
 import { pad } from "@/lib/utils";
@@ -16,9 +17,14 @@ export function WorkExplorer() {
   const float = useRef<HTMLDivElement>(null);
   const list = projects.filter((p) => f === "all" || p.filter === f);
 
-  useGSAP(() => {
-    gsap.fromTo(".work-item", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.05, ease: "power3.out" });
-  }, { dependencies: [f, view], scope: root });
+  useGSAP((_ctx, contextSafe) => {
+    if (prefersReducedMotion()) return;
+    gsap.set(".work-item", { opacity: 0, y: 50 });
+    // wait for the page-transition reveal so the stagger is actually seen
+    return whenReady(contextSafe!(() => {
+      gsap.to(".work-item", { opacity: 1, y: 0, duration: 1, stagger: 0.06, ease: "expo.out", overwrite: "auto" });
+    }));
+  }, { dependencies: [f, view], scope: root, revertOnUpdate: true });
 
   useGSAP(() => {
     if (!isFinePointer()) return;

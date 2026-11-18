@@ -8,7 +8,8 @@ declare global { interface Window { __lenis?: Lenis } }
 export function SmoothScroll() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    // lower lerp = heavier, silkier glide; touch keeps native momentum
+    const lenis = new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95, touchMultiplier: 1.4 });
     window.__lenis = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (t: number) => lenis.raf(t * 1000);
